@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
+	"price-tracker/logging"
 )
 
 var connection *sql.DB
@@ -11,7 +11,7 @@ var connection *sql.DB
 func OpenConnection(path string) {
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
-		log.Fatalf("error opening connection - %v", err)
+		logging.L.Fatalf("error opening connection - %v", err)
 	}
 	connection = db
 }
@@ -19,6 +19,6 @@ func OpenConnection(path string) {
 func CloseConnection() {
 	err := connection.Close()
 	if err != nil {
-		log.Fatalf("error closing connection - %v", err)
+		logging.L.Fatalf("error closing connection - %v", err)
 	}
 }

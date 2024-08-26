@@ -6,7 +6,9 @@ import (
 
 var (
 	insertPriceQuery    = "INSERT INTO price (price, item_id, created_at) VALUES ($1, $2, $3)"
-	selectAllItemsQuery = "SELECT id, name, url FROM item"
+	selectAllItemsQuery = `SELECT item.id, item.name, url, vendor.name, css_selector FROM item
+							INNER JOIN source ON item.id = source.item_id
+         					INNER JOIN vendor ON source.vendor_id = vendor.id`
 )
 
 type PriceRecord struct {
@@ -18,19 +20,21 @@ type PriceRecord struct {
 type TrackedItem struct {
 	ID          string
 	Name        string
-	TrackingURL string
+	URL         string
+	Vendor      string
+	CssSelector string
 }
 
-func GetAllItems() ([]*TrackedItem, error) {
+func GetAllItems() ([]TrackedItem, error) {
 	rows, err := connection.Query(selectAllItemsQuery)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []*TrackedItem
+	var items []TrackedItem
 	for rows.Next() {
-		item := &TrackedItem{}
-		err := rows.Scan(&item.ID, &item.Name, &item.TrackingURL)
+		item := TrackedItem{}
+		err := rows.Scan(&item.ID, &item.Name, &item.URL, &item.Vendor, &item.CssSelector)
 		if err != nil {
 			return nil, err
 		}
